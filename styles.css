@@ -1,0 +1,72 @@
+:root {
+  --bg: #f4f6fa;
+  --card: #fff;
+  --ink: #1e2733;
+  --muted: #66738a;
+  --line: #dfe5ee;
+  --accent: #1760b8;
+  --good: #1a8f5a;
+  --bad: #c23b3b;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.45 system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+header { display: flex; align-items: center; gap: 16px; padding: 16px 24px; background: #12243d; color: #fff; }
+header h1 { font-size: 20px; margin: 0; }
+.status { font-size: 13px; color: #bcd4f2; }
+
+nav { display: flex; gap: 4px; padding: 10px 24px 0; flex-wrap: wrap; }
+.tab { border: 0; background: transparent; padding: 10px 16px; border-radius: 8px 8px 0 0; cursor: pointer; color: var(--muted); font-weight: 600; }
+.tab.active { background: var(--card); color: var(--accent); }
+
+main { padding: 0 24px 40px; max-width: 1500px; }
+section { display: none; }
+section.active { display: block; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin-top: 14px; }
+.card h2 { margin: 0 0 12px; font-size: 17px; }
+.muted { color: var(--muted); font-size: 13px; }
+code { background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+
+.form-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--muted); }
+label.wide { flex: 1 1 320px; }
+input, select, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); min-width: 130px; }
+textarea { width: 100%; min-width: 0; font-family: ui-monospace, monospace; }
+input:focus, select:focus, textarea:focus { outline: 2px solid #a9cdf5; border-color: var(--accent); }
+details { margin-top: 14px; }
+summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+details textarea { margin: 10px 0 6px; }
+
+.btn { border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 9px 14px; border-radius: 6px; cursor: pointer; font: inherit; font-weight: 600; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.small { padding: 6px 10px; font-size: 13px; }
+.btn.danger { color: var(--bad); }
+.file-label { display: inline-flex; align-items: center; }
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 14px 0; }
+
+.table-wrap { overflow-x: auto; padding: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { background: #f8fafc; position: sticky; top: 0; font-size: 12px; color: var(--muted); z-index: 1; }
+tr:hover td { background: #fafcff; }
+td.score { font-weight: 700; text-align: center; }
+td.test-name { white-space: normal; min-width: 250px; max-width: 360px; }
+td.test-name .muted { font-size: 11px; }
+label.inline { display: inline-flex; flex-direction: column; font-size: 11px; gap: 3px; margin-right: 8px; }
+label.inline input { width: 95px; min-width: 0; padding: 6px; }
+label.inline select { min-width: 0; padding: 6px; }
+.flag { border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; font-weight: 700; }
+.flag.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.prog table { font-size: 12px; }
+.prog td { white-space: normal; vertical-align: top; min-width: 110px; }
+.prog td:first-child { min-width: 220px; }
+.prog h2 { margin-bottom: 4px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge.ok { background: #e6f6ee; color: var(--good); }
+.badge.warn { background: #fff0e4; color: #b4661b; }
+
+.hist-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-top: 10px; }
+.hist-card h3 { margin: 0 0 4px; font-size: 15px; }
+.hist-card p { margin: 0; font-size: 13px; color: var(--muted); }
+.empty { color: var(--muted); padding: 24px; text-align: center; }

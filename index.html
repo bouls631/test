@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suivi des tests — Escalade</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🧗 Suivi des tests</h1>
+    <span id="status" class="status">Chargement…</span>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="saisie">Nouveau test</button>
+    <button class="tab" data-tab="historique">Historique</button>
+    <button class="tab" data-tab="progression">Progression</button>
+    <button class="tab" data-tab="programme">Programme J1 / J2 / J3</button>
+    <button class="tab" data-tab="github">Données & GitHub</button>
+  </nav>
+
+  <main>
+    <section id="tab-saisie" class="active">
+      <div class="card">
+        <div class="form-row">
+          <label>Date du test <input type="date" id="test-date"></label>
+          <label>PDC (poids de corps, kg) <input type="number" id="pdc" min="1" step="0.5"></label>
+        </div>
+        <p class="muted">1 jour de repos total entre chaque jour de test. Les scores sont calculés automatiquement à partir de tes saisies.</p>
+      </div>
+
+      <div class="card table-wrap">
+        <table id="saisie-table"></table>
+      </div>
+
+      <div class="card">
+        <label class="wide">Bilan du jour (libre)
+          <textarea id="bilan" rows="3" placeholder="RPE, ressenti, points à travailler…"></textarea>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="save-test" class="btn primary">Enregistrer la journée</button>
+        <button id="reset-test" class="btn">Annuler</button>
+        <span id="saisie-status" class="muted"></span>
+      </div>
+    </section>
+
+    <section id="tab-historique">
+      <div id="historique-list"></div>
+    </section>
+
+    <section id="tab-progression">
+      <div class="card table-wrap">
+        <table id="progression-table"></table>
+      </div>
+      <p class="muted">Chaque colonne est une journée de test. Le nombre entre parenthèses est l'écart avec la journée précédente.</p>
+    </section>
+
+    <section id="tab-programme">
+      <div id="programme-list"></div>
+    </section>
+
+    <section id="tab-github">
+      <div class="card">
+        <h2>Stocker les données sur GitHub</h2>
+        <p class="muted">Les données sont dans un fichier <code>data.json</code> du dépôt. Un jeton d'accès personnel (PAT) avec le droit d'écrire les fichiers est nécessaire.</p>
+        <div class="form-row">
+          <label>Propriétaire <input id="gh-owner" placeholder="ton-compte"></label>
+          <label>Dépôt <input id="gh-repo" placeholder="suivi-tests"></label>
+          <label>Branche <input id="gh-branch" value="main"></label>
+          <label>Fichier <input id="gh-path" value="data.json"></label>
+          <label class="wide">Jeton (PAT) <input id="gh-token" type="password" placeholder="github_pat_…" autocomplete="off"></label>
+        </div>
+        <div class="actions">
+          <button id="gh-save-config" class="btn">Enregistrer la configuration</button>
+          <button id="gh-load" class="btn primary">Charger depuis GitHub</button>
+          <button id="gh-push" class="btn primary">Envoyer sur GitHub</button>
+        </div>
+        <p id="gh-status" class="muted"></p>
+      </div>
+      <div class="card">
+        <h2>Copie locale</h2>
+        <p class="muted">Une copie reste dans ce navigateur. Exportez régulièrement une sauvegarde.</p>
+        <div class="actions">
+          <button id="export-json" class="btn">Exporter data.json</button>
+          <label class="btn file-label">Importer data.json<input type="file" id="import-json" accept=".json,application/json" hidden></label>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="defs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
