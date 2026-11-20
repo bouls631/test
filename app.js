@@ -51,6 +51,12 @@ function setData(d) {
 
 function sessionFor(date) { return data.sessions.find((s) => s.date === date); }
 
+/* Le protocole suit la suite Jour 1 → Jour 2 → Jour 3 → Jour 1 */
+function defaultJour(date) {
+  const prev = data.sessions.filter((s) => s.date < date).sort((a, b) => b.date.localeCompare(a.date))[0];
+  return prev ? (Number(prev.jour) || 1) % 3 + 1 : 1;
+}
+
 function dayShift(date, days) {
   const d = new Date(date + 'T12:00:00');
   d.setDate(d.getDate() + days);
@@ -80,6 +86,7 @@ function renderDay() {
   if (!currentDate) return;
   const s = sessionFor(currentDate);
   $('test-date').value = currentDate;
+  $('jour').value = s?.jour || defaultJour(currentDate);
   $('pdc').value = s?.pdc || data.pdc || '';
   $('bilan').value = s?.bilan || '';
   $('day-label').textContent = 'Test du ' + frDate(currentDate);
@@ -168,8 +175,10 @@ async function githubPush() {
 
 /* ---------- Saisie d'une journée ---------- */
 function renderSaisie() {
+  const jour = Number($('jour').value);
+  $('day-label').textContent = `Test du ${frDate(currentDate)} · Jour ${jour}`;
   const head = '<thead><tr><th>Test</th><th>Saisie</th><th>Score</th><th>Priorité</th><th>Bon potentiel</th><th>Point fort</th></tr></thead>';
-  const rows = TEST_DEFS.map((def) => {
+  const rows = TEST_DEFS.filter((t) => t.jour === jour).map((def) => {
     const d = draft[def.id] || { raw: {}, flags: {} };
     const raw = d.raw || {}, flags = d.flags || {};
     const value = computeScore(def, raw, Number($('pdc').value));
@@ -209,8 +218,9 @@ function saveSession() {
   const adjacent = data.sessions.some((s) => s.date !== date && Math.abs((new Date(date) - new Date(s.date)) / 86400000) === 1);
   if (adjacent && !confirm('Attention : le fichier prévoit 1 jour de repos total entre chaque jour de test. Enregistrer quand même ?')) return;
 
+  const jour = Number($('jour').value);
   const results = {};
-  for (const def of TEST_DEFS) {
+  for (const def of TEST_DEFS.filter((t) => t.jour === jour)) {
     const d = draft[def.id];
     if (!d) continue;
     const raw = d.raw || {}, flags = d.flags || {};
@@ -220,7 +230,7 @@ function saveSession() {
   }
   if (!Object.keys(results).length) { alert('Saisissez au moins un résultat.'); return; }
 
-  const session = { id: 's-' + date, date, pdc, bilan: $('bilan').value.trim(), results };
+  const session = { id: 's-' + date, date, jour, pdc, bilan: $('bilan').value.trim(), results };
   const i = data.sessions.findIndex((s) => s.date === date);
   if (i >= 0) data.sessions[i] = session; else data.sessions.push(session);
   data.pdc = pdc;
@@ -234,7 +244,7 @@ function renderHistorique() {
   const sessions = [...data.sessions].sort((a, b) => b.date.localeCompare(a.date));
   $('historique-list').innerHTML = sessions.length ? sessions.map((s) => {
     const n = Object.keys(s.results || {}).length;
-    return `<div class="hist-card"><div><h3>Test du ${frDate(s.date)}</h3>
+    return `<div class="hist-card"><div><h3>Jour ${s.jour || '?'} — ${frDate(s.date)}</h3>
       <p>PDC ${s.pdc} kg · ${n} test(s) renseigné(s)${s.bilan ? ' · ' + esc(s.bilan).slice(0, 90) : ''}</p></div>
       <div class="actions" style="margin:0"><button class="btn" data-open="${esc(s.id)}">Ouvrir</button><button class="btn danger" data-del="${esc(s.id)}">Supprimer</button></div></div>`;
   }).join('') : '<div class="card empty">Aucune journée de test enregistrée.</div>';
@@ -251,7 +261,7 @@ function openSession(id) {
 function renderProgression() {
   const sessions = [...data.sessions].sort((a, b) => a.date.localeCompare(b.date));
   if (!sessions.length) { $('progression-table').innerHTML = '<tbody><tr><td class="empty">Aucune donnée.</td></tr></tbody>'; return; }
-  const head = '<thead><tr><th>Test</th>' + sessions.map((s) => `<th><button class="link" data-open="${s.date}" title="Ouvrir cette journée">${frDate(s.date)}</button></th>`).join('') + '</tr></thead>';
+  const head = '<thead><tr><th>Jour</th><th>Test</th>' + sessions.map((s) => `<th><button class="link" data-open="${s.date}" title="Ouvrir cette journée">J${s.jour || '?'} · ${frDate(s.date)}</button></th>`).join('') + '</tr></thead>';
   const rows = TEST_DEFS.map((def) => {
     const vals = sessions.map((s) => s.results?.[def.id]?.score ?? null);
     const cells = vals.map((v, i) => {
@@ -260,7 +270,7 @@ function renderProgression() {
       const delta = prev == null ? '' : `<br><span class="muted">${v - prev > 0 ? '+' : ''}${Math.round((v - prev) * 100) / 100}</span>`;
       return `<td class="score"><strong>${scoreText(def, sessions[i].results[def.id].raw, v)}</strong>${delta}</td>`;
     }).join('');
-    return `<tr><td class="test-name"><strong>${esc(def.name)}</strong></td>${cells}</tr>`;
+    return `<tr><td class="score">J${def.jour}</td><td class="test-name"><strong>${esc(def.name)}</strong></td>${cells}</tr>`;
   }).join('');
   $('progression-table').innerHTML = head + '<tbody>' + rows + '</tbody>';
 }
@@ -284,6 +294,7 @@ document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () 
 $('saisie-table').addEventListener('input', onField);
 $('saisie-table').addEventListener('change', onField);
 $('pdc').addEventListener('input', renderSaisie);
+$('jour').addEventListener('change', renderSaisie);
 $('saisie-table').addEventListener('click', (e) => {
   const b = e.target.closest('[data-flag]');
   if (!b) return;

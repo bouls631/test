@@ -2,6 +2,7 @@
 const TEST_DEFS = [
  {
   "id": "susp20",
+  "jour": 1,
   "name": "suspension 20mm (5 sec max lesté)",
   "url": "https://youtu.be/7oOf49JIy6w",
   "rule": "score = (PDC+leste)/PDC",
@@ -17,6 +18,7 @@ const TEST_DEFS = [
  },
  {
   "id": "doigts3",
+  "jour": 1,
   "name": "3 doigts tendus : suspension 20mm (5 sec max lesté)",
   "url": "https://youtu.be/UXFN-x0aPsQ",
   "rule": "score = (PDC+leste)/PDC",
@@ -32,6 +34,7 @@ const TEST_DEFS = [
  },
  {
   "id": "traction1rm",
+  "jour": 1,
   "name": "Traction lesté (1RM)",
   "url": "https://youtu.be/_laVN1H4coM",
   "rule": "score = (PDC+leste)/PDC",
@@ -47,6 +50,7 @@ const TEST_DEFS = [
  },
  {
   "id": "onoff5",
+  "jour": 1,
   "name": "5\"On/ 5\"Off 20mm (PDC)",
   "url": "https://youtu.be/5DIch0Rj2Lc",
   "rule": "score = temps total tenu. exemple : échec à la rep 25 alors score = 250 sec",
@@ -62,6 +66,7 @@ const TEST_DEFS = [
  },
  {
   "id": "blocageMax",
+  "jour": 2,
   "name": "Blocage 1 bras 90° PDC (max temps)",
   "url": "https://youtu.be/7RuzhWaaQ0c",
   "rule": "score = temps tenu en sec (somme bras droit + bras gauche)",
@@ -82,6 +87,7 @@ const TEST_DEFS = [
  },
  {
   "id": "blocageLeste",
+  "jour": 2,
   "name": "Blocage 1 bras 90° (5 sec max lesté)",
   "url": "https://youtu.be/mZal6-CKacM",
   "rule": "score = charge tenue au moins 3 sec. idéalement 5 sec",
@@ -97,6 +103,7 @@ const TEST_DEFS = [
  },
  {
   "id": "frontLever",
+  "jour": 2,
   "name": "1/4 de Front lever (30sec+)",
   "url": "https://youtu.be/Htb4UyOxXQQ",
   "rule": "score = temps tenu en  sec + nom de la position tennue par exemple : 1/4 de front 24 sec",
@@ -117,6 +124,7 @@ const TEST_DEFS = [
  },
  {
   "id": "dips",
+  "jour": 2,
   "name": "Max de Dips au PDC",
   "url": "https://youtu.be/T7k2m7f1QnQ",
   "rule": "score = nb de reps ou charge max sur 1 rep",
@@ -137,6 +145,7 @@ const TEST_DEFS = [
  },
  {
   "id": "tractionCluster",
+  "jour": 3,
   "name": "Traction 2 bras (cluster 2 sec, max reps)",
   "url": "https://youtu.be/7KoIze8p8IU",
   "rule": "score = nb de reps ou charge additionelle + nb de reps",
@@ -157,6 +166,7 @@ const TEST_DEFS = [
  },
  {
   "id": "onoff7",
+  "jour": 3,
   "name": "7\"On/3\"Off 20mm (PDC à l'échec)",
   "url": "https://youtu.be/OgbOUktAtkg",
   "rule": "score = temps total tenu. exemple : échec à la rep 25 alors score = 250 sec",
@@ -172,6 +182,7 @@ const TEST_DEFS = [
  },
  {
   "id": "onoff3",
+  "jour": 3,
   "name": "3\"On/3\"Off (90% 1RM)",
   "url": "https://youtu.be/KgiJbrXJDa4",
   "rule": "score = temps total tenu. exemple : échec à la rep 25 alors score = 250 sec",
