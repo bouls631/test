@@ -5,7 +5,7 @@ const LS_DATA = 'suivi-tests.data';
 let data = { version: 2, pdc: 75, sessions: [] };
 let config = {};
 let draft = {};
-let editingId = null;
+let currentDate = null;
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -46,8 +46,48 @@ function saveLocal() { localStorage.setItem(LS_DATA, JSON.stringify(data)); }
 function setData(d) {
   data = { version: 2, pdc: Number(d.pdc) || 0, sessions: Array.isArray(d.sessions) ? d.sessions : [] };
   saveLocal();
-  $('pdc').value = data.pdc || '';
-  renderSaisie(); renderHistorique(); renderProgression();
+  renderAll();
+}
+
+function sessionFor(date) { return data.sessions.find((s) => s.date === date); }
+
+function dayShift(date, days) {
+  const d = new Date(date + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function renderAll() {
+  renderDay(); renderHistorique(); renderProgression(); renderProgramme();
+}
+
+/* Chaque journée a sa propre page : #/jour/AAAA-MM-DD */
+function goToDay(date, push = true) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+  const changed = currentDate !== date;
+  currentDate = date;
+  if (push && location.hash !== '#/jour/' + date) location.hash = '#/jour/' + date;
+  renderDay();
+  if (changed) showTab('saisie');
+}
+
+function hashDay() {
+  const m = location.hash.match(/^#\/jour\/(\d{4}-\d{2}-\d{2})$/);
+  return m ? m[1] : null;
+}
+
+function renderDay() {
+  if (!currentDate) return;
+  const s = sessionFor(currentDate);
+  $('test-date').value = currentDate;
+  $('pdc').value = s?.pdc || data.pdc || '';
+  $('bilan').value = s?.bilan || '';
+  $('day-label').textContent = 'Test du ' + frDate(currentDate);
+  $('day-delete').hidden = !s;
+  document.title = `${s ? 'Test du ' + frDate(currentDate) : 'Nouveau jour'} — Suivi escalade`;
+  draft = {};
+  for (const [tid, r] of Object.entries(s?.results || {})) draft[tid] = { raw: { ...(r.raw || {}) }, flags: { ...(r.flags || {}) } };
+  renderSaisie();
 }
 
 async function loadInitial() {
@@ -62,8 +102,9 @@ async function loadInitial() {
       if (r.ok) setData(await r.json());
     } catch { /* ouverture en file:// sans fetch */ }
   }
-  $('test-date').value = today();
-  renderSaisie(); renderHistorique(); renderProgression(); renderProgramme();
+  currentDate = hashDay() || today();
+  if (!location.hash) location.hash = '#/jour/' + currentDate;
+  renderAll();
   status(`${data.sessions.length} journée(s) de test · copie locale`);
   if (config.owner && config.repo && config.token) await githubLoad(true);
 }
@@ -159,19 +200,13 @@ function onField(e) {
   row.querySelector('.computed').textContent = scoreText(def, d.raw, computeScore(def, d.raw, Number($('pdc').value)));
 }
 
-function resetDraft(keepDate = false) {
-  draft = {}; editingId = null;
-  if (!keepDate) { $('test-date').value = today(); $('bilan').value = ''; }
-  renderSaisie();
-}
-
 function saveSession() {
   const date = $('test-date').value;
   const pdc = Number($('pdc').value);
   if (!date) { alert('Choisissez une date.'); return; }
   if (!(pdc > 0)) { alert('Renseignez le PDC (poids de corps) en kg.'); return; }
 
-  const adjacent = data.sessions.some((s) => s.id !== editingId && Math.abs((new Date(date) - new Date(s.date)) / 86400000) === 1);
+  const adjacent = data.sessions.some((s) => s.date !== date && Math.abs((new Date(date) - new Date(s.date)) / 86400000) === 1);
   if (adjacent && !confirm('Attention : le fichier prévoit 1 jour de repos total entre chaque jour de test. Enregistrer quand même ?')) return;
 
   const results = {};
@@ -185,13 +220,12 @@ function saveSession() {
   }
   if (!Object.keys(results).length) { alert('Saisissez au moins un résultat.'); return; }
 
-  const session = { id: editingId || 's-' + Date.now(), date, pdc, bilan: $('bilan').value.trim(), results };
-  const i = data.sessions.findIndex((s) => s.id === session.id);
+  const session = { id: 's-' + date, date, pdc, bilan: $('bilan').value.trim(), results };
+  const i = data.sessions.findIndex((s) => s.date === date);
   if (i >= 0) data.sessions[i] = session; else data.sessions.push(session);
   data.pdc = pdc;
   saveLocal();
-  resetDraft();
-  renderHistorique(); renderProgression();
+  renderDay(); renderHistorique(); renderProgression();
   $('saisie-status').textContent = `Journée du ${frDate(date)} enregistrée en local — pensez à l’envoyer sur GitHub.`;
 }
 
@@ -207,22 +241,17 @@ function renderHistorique() {
 }
 
 function openSession(id) {
-  const s = data.sessions.find((x) => x.id === id);
+  const s = data.sessions.find((x) => x.id === id || x.date === id);
   if (!s) return;
-  editingId = id;
-  $('test-date').value = s.date;
-  $('pdc').value = s.pdc;
-  $('bilan').value = s.bilan || '';
-  draft = {};
-  for (const [tid, r] of Object.entries(s.results || {})) draft[tid] = { raw: { ...(r.raw || {}) }, flags: { ...(r.flags || {}) } };
-  showTab('saisie'); renderSaisie(); window.scrollTo(0, 0);
+  goToDay(s.date);
+  window.scrollTo(0, 0);
 }
 
 /* ---------- Progression jour par jour ---------- */
 function renderProgression() {
   const sessions = [...data.sessions].sort((a, b) => a.date.localeCompare(b.date));
   if (!sessions.length) { $('progression-table').innerHTML = '<tbody><tr><td class="empty">Aucune donnée.</td></tr></tbody>'; return; }
-  const head = '<thead><tr><th>Test</th>' + sessions.map((s) => `<th>${frDate(s.date)}</th>`).join('') + '</tr></thead>';
+  const head = '<thead><tr><th>Test</th>' + sessions.map((s) => `<th><button class="link" data-open="${s.date}" title="Ouvrir cette journée">${frDate(s.date)}</button></th>`).join('') + '</tr></thead>';
   const rows = TEST_DEFS.map((def) => {
     const vals = sessions.map((s) => s.results?.[def.id]?.score ?? null);
     const cells = vals.map((v, i) => {
@@ -264,15 +293,30 @@ $('saisie-table').addEventListener('click', (e) => {
   b.classList.toggle('on', !!d.flags[key]);
 });
 $('save-test').addEventListener('click', saveSession);
-$('reset-test').addEventListener('click', () => resetDraft(true));
+$('reset-test').addEventListener('click', renderDay);
+$('test-date').addEventListener('change', (e) => goToDay(e.target.value));
+$('day-prev').addEventListener('click', () => goToDay(dayShift(currentDate, -1)));
+$('day-next').addEventListener('click', () => goToDay(dayShift(currentDate, 1)));
+$('day-today').addEventListener('click', () => goToDay(today()));
+$('day-new').addEventListener('click', () => goToDay(today()));
+$('day-delete').addEventListener('click', () => {
+  if (!sessionFor(currentDate) || !confirm(`Supprimer la journée du ${frDate(currentDate)} ?`)) return;
+  data.sessions = data.sessions.filter((s) => s.date !== currentDate);
+  saveLocal(); renderDay(); renderHistorique(); renderProgression();
+});
 $('historique-list').addEventListener('click', (e) => {
   const open = e.target.closest('[data-open]'), del = e.target.closest('[data-del]');
   if (open) openSession(open.dataset.open);
   if (del && confirm('Supprimer cette journée de test ?')) {
     data.sessions = data.sessions.filter((s) => s.id !== del.dataset.del);
-    saveLocal(); renderHistorique(); renderProgression();
+    saveLocal(); renderAll();
   }
 });
+$('progression-table').addEventListener('click', (e) => {
+  const open = e.target.closest('[data-open]');
+  if (open) openSession(open.dataset.open);
+});
+window.addEventListener('hashchange', () => { const d = hashDay(); if (d) goToDay(d, false); });
 
 $('gh-save-config').addEventListener('click', () => {
   config = Object.fromEntries(['owner', 'repo', 'branch', 'path', 'token'].map((k) => [k, $(`gh-${k}`).value.trim()]));

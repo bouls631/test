@@ -66,6 +66,10 @@ label.inline select { min-width: 0; padding: 6px; }
 .badge.ok { background: #e6f6ee; color: var(--good); }
 .badge.warn { background: #fff0e4; color: #b4661b; }
 
+.day-nav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.day-nav strong { font-size: 16px; min-width: 165px; }
+.link { border: 0; background: transparent; color: var(--accent); cursor: pointer; font: inherit; font-weight: 700; padding: 0; }
+.link:hover { text-decoration: underline; }
 .hist-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-top: 10px; }
 .hist-card h3 { margin: 0 0 4px; font-size: 15px; }
 .hist-card p { margin: 0; font-size: 13px; color: var(--muted); }

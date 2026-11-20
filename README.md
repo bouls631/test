@@ -10,8 +10,9 @@ Petite application web pour faire et noter ses tests d'escalade **jour par jour*
   - charge tenue ou nombre de répétitions pour le blocage lesté, les dips et la traction cluster.
   - Cases **P** (à travailler en priorité), **B** (bon potentiel), **F** (point fort) reprises du « Bilan des tests », plus un bilan libre.
   - Un rappel et une confirmation si une autre journée est à un jour d'écart (*1 jour de repos total entre chaque jour de test*).
-- **Historique** : une journée = une carte ; ouvrir pour modifier, supprimer.
-- **Progression** : un tableau avec une colonne par date et l'écart avec la journée précédente.
+- **Une page par jour** : chaque journée a sa propre URL `#/jour/AAAA-MM-DD` (ex. `https://bouls631.github.io/test/#/jour/2026-11-20`). La barre ‹ › permet de passer d'un jour à l'autre, « Aujourd'hui » d'y revenir, et « Nouveau jour » de repartir d'une feuille vierge. Enregistrer remplit la page du jour, sans toucher aux autres.
+- **Historique** : une journée = une carte ; ouvrir amène sur sa page, supprimer la retire.
+- **Progression** : un tableau avec une colonne par date (cliquable) et l'écart avec la journée précédente.
 - **Programme** : les 3 journées d'entraînement de l'Excel (séries, répétitions, charge, repos, consignes, objectif, notes athlète), avec les liens vidéo cliquables.
 - **Données** : lecture/écriture de `data.json` via l'API GitHub, export/import d'une copie locale.
 

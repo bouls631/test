@@ -13,7 +13,7 @@
   </header>
 
   <nav>
-    <button class="tab active" data-tab="saisie">Nouveau test</button>
+    <button class="tab active" data-tab="saisie">Jour</button>
     <button class="tab" data-tab="historique">Historique</button>
     <button class="tab" data-tab="progression">Progression</button>
     <button class="tab" data-tab="programme">Programme J1 / J2 / J3</button>
@@ -22,6 +22,15 @@
 
   <main>
     <section id="tab-saisie" class="active">
+      <div class="card day-nav">
+        <button id="day-prev" class="btn" title="Jour précédent">‹</button>
+        <strong id="day-label"></strong>
+        <button id="day-next" class="btn" title="Jour suivant">›</button>
+        <button id="day-today" class="btn">Aujourd'hui</button>
+        <button id="day-new" class="btn primary">Nouveau jour</button>
+        <button id="day-delete" class="btn danger" hidden>Supprimer cette journée</button>
+      </div>
+
       <div class="card">
         <div class="form-row">
           <label>Date du test <input type="date" id="test-date"></label>
